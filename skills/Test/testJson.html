@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>My Misty Remote Controller</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Reference a link to a CDN for Axios here -->
+    <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+  </head>
+  <body style = "background-color:aliceblue;">
+    
+    <script>
+      // Declare a constant variable.
+      // Set its value to your robot's IP address.
+      //const ip = "192.168.1.5";
+
+      // Create a data object to send with the POST request. 
+      // Set values for each RGB color property.
+
+      function makeWebServiceCall(payload) {
+
+	  var ip = document.getElementById("misty-robot-ip-address").value;
+	  
+	  var  Data = {
+	      "Skill":"7d6fe0a1-61b4-4df5-872a-568776310d2f",
+	      "EventName": "ActionScript",
+	      "Payload": payload
+	  };
+	  console.log(Data);
+
+	  Promise.race([
+	      fetch('http://' + ip + '/api/skills/event', {
+		  method: 'POST',
+		  headers: {
+		      "Accept": "application/json",
+		      "Content-Type": "application/json"
+		  },
+		  body: JSON.stringify(Data),
+		  dataType: "json"
+	      }),
+	      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000))
+	  ])
+	      .then(response => response.json())
+	      .then(jsonData => console.log(jsonData)); 
+      }
+
+      
+      function makeCall() {
+
+	  
+	var payload = 
+	    fetch(document.getElementById("json-file").value,{mode: 'no-cors'})
+	    .then(response => response.json())
+	    .then(Data => {
+		makeWebServiceCall(Data)
+	    });
+      }
+
+	  /*makeWebServiceCall({"intent": "missingVanilla(level 1)","description": "Vanilla is missing from the recipe. Level 1 = positive remark","actionList":[{"name": "LookInDirection","args": ["center"]},{"name": "SetEyes","args": ["happy"]},{"name": "SayText","args": ["Looking delicious so far!"]},{"name": "Pause","args": ["1500"]},{"name": "SetEyes","args": ["default"]},{"name": "LookInDirection","args": ["down"]}]})
+      }*/
+	//"intent": "missingVanilla(level 1)","description": "Vanilla is missing from the recipe. Level 1 = positive remark","actionList":[{"name": "LookInDirection","args": ["center"]},{"name": "SetEyes","args": ["happy"]},{"name": "SayText","args": ["Looking delicious so far!"]},{"name": "Pause","args": ["1500"]},{"name": "SetEyes","args": ["default"]},{"name": "LookInDirection","args": ["down"]}]
+	
+    
+    
+    // Call axios.post(). Pass the URL of the ChangeLED 
+    // endpoint as the first parameter and the data object 
+    // as the second.
+
+    // Use a then() method after calling axios.post(). 
+    // Pass in a callback function to interpret the return 
+    // values of the call and to print a message to the console 
+    // indicating the request's success.
+
+    // Use a catch() method after then(). catch() triggers 
+    // if the promise is rejected. Pass a callback to catch() 
+    // to print any errors to the console.
+    
+    // axios.post("http://" + ip + "/api/led", data)
+    //     .then(function (response) {
+    //         console.log(`ChangeLED was a ${response.data.status}`);
+    //     })
+    //     .catch(function (error) {
+    //         console.log(`There was an error with the request ${error}`);
+    //     });      
+  </script>
+  
+  <div>
+    <style>
+      h1 {text-align: center;}
+      h2 {text-align: center;}
+      button {text-align: center;}
+      .wrapper {
+	  text-align: center;
+      }
+
+      .button {
+	  position: absolute;
+	  top: 50%;
+      }
+    </style>
+    
+    <h1> Misty's Interface </h1>
+    <h2> IP Address: <input id="misty-robot-ip-address" value="192.168.1.4"> </h2>
+    <h2> JSON File: <input id="json-file" type="text" name="text"> </h2>
+    
+    <p></span></p>
+    
+    <div class="wrapper">
+      <button style="background-color:darkslategray; border-color:green;color:white" onclick="makeCall()" >Run! </button>
+    </div>
+    
+  </div>
+</body>
+</html>

@@ -1,0 +1,255 @@
+
+(:method Give_Help_Urgently
+   :task (GiveHelp ?item ?level ?infoText)
+   :precondition (and
+      (user ?name)
+      (urgencyLevel high))
+   :ordered-subtasks (and
+      (ProvideInfo ?infoText ?level)
+      (ReleaseTurn)))
+
+(:method Give_Help_Supportively
+   :task (GiveHelp ?item ?level ?infoText)
+   :precondition (and
+      (user ?name))
+   :ordered-subtasks (and
+      (TakeTurn)
+      (ProvideInfo ?infoText ?level)
+      (ReleaseTurn)))
+
+(:method Respond_Speech
+   :task (ProvideInfo ?text ?level)
+   :preconditions (and
+      (eq ?level 1))
+   :ordered-subtasks (and
+      (SayText ?text)))
+
+(:method Respond_Speech_Look
+   :task (ProvideInfo ?text ?level)
+   :preconditions (and
+      (eq ?level 2)
+      (userEngaged ?user)
+      (userLocation ?userDirection))
+   :ordered-subtasks (and
+      (SearchSurface)
+      (Pause 1000)
+      (LookInDirection ?userDirection)
+      (SayText ?text)))
+
+(:method Respond_Speech_Look
+   :task (ProvideInfo ?text ?level)
+   :preconditions (and
+      (eq ?level 2))
+   :ordered-subtasks (and
+      (SearchSurface)
+      (Pause 1000)
+      (SayText ?text)))
+
+(:method Respond_Speech_Look
+   :task (ProvideInfo ?text ?level)
+   :preconditions (and
+      (eq ?level 3)
+      (userEngaged ?user))
+   :ordered-subtasks (and
+      (SayText ?text)
+      (Confirmation_Gaze)))
+
+(:method Respond_Speech_Look
+   :task (ProvideInfo ?text ?level)
+   :preconditions (and
+      (eq ?level 3)
+      (userLocation ?userDirection))
+   :ordered-subtasks (and
+      (LookInDirection ?userDirection)
+      (SayText ?text)))
+
+(:method Respond_Speech_Gesture
+   :task (ProvideInfo ?text ?level)
+   :preconditions (and
+      (eq ?level 4)
+      (userEngaged ?user)
+      (objectLocation ?objDirection)
+      (userLocation ?userDirection))
+   :ordered-subtasks (and
+      (Pause 2000)
+      (LookInDirection ?userDirection)
+      (Pause 1500)
+      (LookInDirection ?objDirection)
+      (Pause 1000)
+      (PointAt downwards right)
+      (Pause 100)
+      (SayText ?text)
+      (Pause 250)
+      (Confirmation_Gaze)))
+
+(:method Respond_Speech_Gesture
+   :task (ProvideInfo ?text ?level)
+   :preconditions (and
+      (eq ?level 4)
+      (userLocation ?userDirection))
+   :ordered-subtasks (and
+      (LookInDirection ?userDirection)
+      (SayText ?text)
+      (Confirmation_Gaze)))
+
+(:method Confirmation_Gaze_Call
+   :precondition (and
+      (user ?name)
+      (userLocation ?userDirection)
+      (objectLocation ?objDirection))
+   :task (Confirmation_Gaze)
+   :ordered-subtasks (and
+      (LookInDirection ?userDirection)
+      (Pause 1000)
+      (LookInDirection ?objDirection) 
+      (Pause 1000)
+      (LookInDirection ?userDirection)))
+
+(:method SearchSurface_Call
+   :precondition (and
+      (user ?name))
+   :task (SearchSurface)
+   :ordered-subtasks (and
+      (SetEyes looking)
+      (LookInDirection lowerLeft) 
+      (Pause 1400)
+      (LookInDirection lowerRight)))
+
+(:method AppearNeutral_Call
+   :precondition (and
+      (user ?name))
+   :task (AppearNeutral)
+   :ordered-subtasks (and
+      (SetEyes default)
+      (Pause 200)
+      (PointAt default both)))
+
+(:method Facial_AppearThinking
+   :precondition (and
+      (user ?name)
+      (userEngaged ?user))
+   :task (AppearThinking)
+   :ordered-subtasks (and
+      (SetEyes thinking)
+      (Pause 100)))
+
+(:method Physical_AppearThinking
+   :precondition (and
+      (user ?name)
+      (userEngaged ?user))
+   :task (AppearThinking)
+   :ordered-subtasks (and
+      (SetEyes thinking)
+      (Pause 100)
+      (TiltHead left large)))
+
+(:method Verbal_AppearThinking
+   :task (AppearThinking)
+   :preconditions (and
+      (user ?name))
+   :ordered-subtasks (and
+      (SayText "Ummm.. ")
+      (SetEyes thinking)
+      (Pause 100)
+      (TiltHead left large)))
+
+(:method Look_Away
+   :task (RequestTurn ?direction)
+   :preconditions (and
+      (user ?name))
+   :ordered-subtasks (and
+      (LookInDirection ?direction)))
+
+(:method Politely_Take_Turn_Statement
+   :task (TakeTurn)
+   :preconditions (and
+      (user ?name)
+      (userLocation ?userDirection)
+      (manner polite)
+      (userEngaged ?name))
+   :ordered-subtasks (and
+      (LookInDirection ?userDirection)
+      (Pause 1000)
+      (TiltHead right small)))
+
+(:method Politely_Take_Turn_Statement
+   :task (TakeTurn)
+   :preconditions (and
+      (user ?name)
+      (userLocation ?userDirection)
+      (manner polite))
+   :ordered-subtasks (and
+      (TiltHead right small)))
+
+(:method Politely_Take_Turn_Question
+   :task (TakeTurn)
+   :preconditions (and
+      (user ?name)
+      (userLocation ?userDirection)
+      (manner polite)
+      (askedQuestion ?user))
+   :ordered-subtasks (and
+      (LookInDirection ?userDirection)
+      (AppearThinking)))
+
+(:method LookAtUser_ReturnTurn
+   :task (ReleaseTurn)
+   :preconditions (and
+      (user ?name)
+      (userLocation ?direction)
+      (userEngaged ?user))
+   :ordered-subtasks (and
+      (AppearNeutral)
+      (LookInDirection ?direction)))
+
+(:method LookAtTask_ReturnTurn
+   :task (ReleaseTurn)
+   :preconditions (and
+      (user ?name)
+      (taskLocation ?taskDirection))
+   :ordered-subtasks (and
+      (AppearNeutral)
+      (LookInDirection ?taskDirection)))
+
+
+(:action LookInDirection
+   :parameters (?dir - location)
+   :precondition (and
+      ())
+    :effect (and
+      ()))
+
+(:action Pause
+   :parameters (?t - time)
+   :precondition (and
+      ())
+    :effect (and
+      ()))
+
+(:action TiltHead
+   :parameters (?d - direction ?s - size)
+   :precondition (and
+      ())
+    :effect (and
+      ()))
+
+(:action SetEyes
+   :parameters (?e - emotion)
+   :precondition (and
+      ())
+    :effect (and
+      ()))
+
+(:action PointAt
+   :parameters (?d - direction ?a - arm)
+   :precondition (and
+      ())
+    :effect (and
+      ()))
+
+(:action SayText
+   :parameters (?spe - speech)
+   :precondition (and
+      ())
+    :effect (and
+      ()))
